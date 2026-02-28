@@ -56,9 +56,12 @@ dependencies {
     implementation("org.http4k:http4k-core")
     implementation("org.http4k:http4k-format-jackson")
     implementation("org.http4k:http4k-server-undertow")
+    implementation("org.http4k:http4k-api-openapi")
+    // for OpenAPI rendering:
+    implementation("org.http4k:http4k-format-jackson")
     testImplementation("org.http4k:http4k-testing-hamkrest")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:6.0.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:6.0.2")
-    testImplementation("org.junit.platform:junit-platform-launcher:6.0.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.2")
+    testImplementation("org.junit.platform:junit-platform-launcher:1.10.2")
 }
 
