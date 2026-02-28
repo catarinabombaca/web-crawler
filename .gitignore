@@ -1,6 +1,3 @@
-# Compiled class file
-*.class
-
 # Log file
 *.log
 
@@ -25,3 +22,14 @@ replay_pid*
 
 # Kotlin Gradle plugin data, see https://kotlinlang.org/docs/whatsnew20.html#new-directory-for-kotlin-data-in-gradle-projects
 .kotlin/
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
+
+# Ignore IDE files
+.idea/
+
+# Keep this file: the wrapper is a key part of making Gradle projects portable and self-contained.
+!gradle/wrapper/gradle-wrapper.jar
