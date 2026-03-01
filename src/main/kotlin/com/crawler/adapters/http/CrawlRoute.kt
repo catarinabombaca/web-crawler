@@ -1,5 +1,6 @@
 package com.crawler.adapters.http
 
+import com.crawler.domain.ports.Crawler
 import org.http4k.contract.ContractRoute
 import org.http4k.contract.bindContract
 import org.http4k.contract.div
@@ -13,7 +14,7 @@ import org.http4k.core.Response.Companion.invoke
 import org.http4k.core.Status.Companion.OK
 import org.http4k.format.ConfigurableJackson
 
-class CrawlRoute {
+class CrawlRoute(val crawler: Crawler) {
     private val spec = "/crawl" meta {
         summary = "Crawl the given seed url"
         description = "The crawler should print each URL visited, and a list of links found on that page"
@@ -24,7 +25,12 @@ class CrawlRoute {
     fun contractRoutes(): List<ContractRoute> =
         listOf(spec bindContract POST to ::crawlHandler)
 
-    private fun crawlHandler(request: Request): Response = Response(OK)
+    private fun crawlHandler(request: Request): Response {
+        val crawlRequestDTO = crawlRequestDTOLens(request)
+        crawler.crawl(crawlRequestDTO.url)
+
+        return Response(OK)
+    }
 
     companion object {
         val crawlRequestDTOLens = Body.auto<CrawlRequestDTO>().toLens()

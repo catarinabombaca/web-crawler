@@ -59,6 +59,7 @@ dependencies {
     implementation("org.http4k:http4k-api-openapi")
     // for OpenAPI rendering:
     implementation("org.http4k:http4k-format-jackson")
+    implementation("org.jsoup:jsoup:1.17.2")
     testImplementation("org.http4k:http4k-testing-hamkrest")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.2")

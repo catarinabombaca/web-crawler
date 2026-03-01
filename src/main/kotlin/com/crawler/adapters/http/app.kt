@@ -1,5 +1,7 @@
 package com.crawler.adapters.http
 
+import com.crawler.domain.services.CrawlerService
+import org.http4k.client.OkHttp
 import org.http4k.contract.contract
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -11,6 +13,6 @@ val app: HttpHandler = routes(
     "/ping" bind GET to ::healthHandler,
     "/formats/json/jackson" bind GET to ::formatHandler,
     contract {
-        routes += CrawlRoute().contractRoutes()
+        routes += CrawlRoute(CrawlerService(OkHttp())).contractRoutes()
     }
 )
