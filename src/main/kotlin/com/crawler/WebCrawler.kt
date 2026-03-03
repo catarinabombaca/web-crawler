@@ -1,16 +1,22 @@
 package com.crawler
 
-import com.crawler.adapters.http.app
-import org.http4k.core.HttpHandler
-import org.http4k.core.then
-import org.http4k.filter.DebuggingFilters.PrintRequest
-import org.http4k.server.Undertow
-import org.http4k.server.asServer
+import com.crawler.adapters.htmlFetcher.ApiHtmlFetcher
+import com.crawler.adapters.printer.TerminalPrinter
+import com.crawler.domain.services.CrawlerService
+import dev.forkhandles.result4k.onFailure
+import org.http4k.client.OkHttp
 
-fun main() {
-    val printingApp: HttpHandler = PrintRequest().then(app)
+fun main(args: Array<String>) {
+    if (args.isEmpty()) {
+        println("Usage: web-crawler <url>")
+        return
+    }
 
-    val server = printingApp.asServer(Undertow(9000)).start()
+    val seedUrl = args[0]
+    val crawler = CrawlerService(ApiHtmlFetcher(OkHttp()), TerminalPrinter())
 
-    println("Server started on " + server.port())
+    crawler.crawl(seedUrl).onFailure {
+        System.err.println("Error: ${it.reason.error}")
+        return
+    }
 }

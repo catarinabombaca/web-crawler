@@ -14,7 +14,6 @@ class CrawlerService(
     private val outputPrinter: OutputPrinter
 ) : Crawler {
     override fun crawl(seedUrl: String): Result<List<String>, CrawlerFailure> {
-        val domain = "https://${seedUrl.split("/")[2]}"
         val visited = mutableSetOf<String>()
         val queue = ArrayDeque<String>()
 
@@ -33,11 +32,15 @@ class CrawlerService(
 
             urlsFound
                 .filter { it !in visited }
-                .filter { it.startsWith(domain) }
+                .filter { it.startsWith(getDomain(seedUrl)) }
                 .forEach { queue.add(it) }
         }
 
         return Success(visited.toList())
+    }
+
+    private fun getDomain(seedUrl: String) : String {
+        return "https://${seedUrl.split("/")[2]}"
     }
 
     private fun extractUrls(html: String, url: String): List<String> {

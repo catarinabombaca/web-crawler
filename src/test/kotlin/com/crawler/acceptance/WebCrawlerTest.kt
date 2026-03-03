@@ -1,11 +1,9 @@
 package com.crawler.acceptance
 
-import com.crawler.adapters.http.CrawlRequestDTO
-import com.crawler.adapters.http.CrawlRoute
-import com.crawler.adapters.http.app
-import org.http4k.core.Method
-import org.http4k.core.Request
-import org.http4k.core.with
+import com.crawler.adapters.htmlFetcher.ApiHtmlFetcher
+import com.crawler.adapters.printer.TerminalPrinter
+import com.crawler.domain.services.CrawlerService
+import com.crawler.fakes.fakeHttpClient
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -31,16 +29,12 @@ class WebCrawlerTest {
     @Test
     fun `Given a seed URL, the crawler should visit each URL it finds on the same domain`() {
         val seedUrl = "https://example.com/"
-        val numberOfExpectedVisitedUrls = 3
-        val requestBody = CrawlRequestDTO(url = seedUrl)
+        val crawler = CrawlerService(ApiHtmlFetcher(fakeHttpClient), TerminalPrinter())
 
-        app(
-            Request(Method.POST, "/crawl")
-                .with(CrawlRoute.crawlRequestDTOLens of requestBody)
-        )
+        crawler.crawl(seedUrl)
 
         val printedUrls = outputStream.toString().trim().lines().size
-        assertEquals(numberOfExpectedVisitedUrls, printedUrls)
+        assertEquals(3, printedUrls)
     }
 
     @Test
@@ -51,14 +45,10 @@ class WebCrawlerTest {
             Visited: https://example.com/about -> Found links: N/A
             Visited: https://example.com/contact -> Found links: N/A
         """.trimIndent()
+        val crawler = CrawlerService(ApiHtmlFetcher(fakeHttpClient), TerminalPrinter())
 
-        val requestBody = CrawlRequestDTO(url = seedUrl)
-        app(
-            Request(Method.POST, "/crawl")
-                .with(CrawlRoute.crawlRequestDTOLens of requestBody)
-        )
+        crawler.crawl(seedUrl)
 
-        val printedOutput = outputStream.toString().trim()
-        assertEquals(expectedOutput, printedOutput)
+        assertEquals(expectedOutput, outputStream.toString().trim())
     }
 }
