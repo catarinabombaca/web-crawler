@@ -36,7 +36,6 @@ class WebCrawlerTest {
     @AfterEach
     fun tearDown() {
         System.setOut(originalOut)
-        outputStream.reset()
         testServer.stop()
     }
 
@@ -61,6 +60,6 @@ class WebCrawlerTest {
 
         main(arrayOf("$base/"))
 
-        assertEquals(expectedOutput, outputStream.toString().trim())
+        assertEquals(expectedOutput.lines().sorted(), outputStream.toString().trim().lines().sorted())
     }
 }

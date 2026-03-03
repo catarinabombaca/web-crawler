@@ -1,34 +1,26 @@
 # Web Crawler
 
-After unzipping, make the Gradle wrapper executable before running any commands:
+Crawls a website starting from a seed URL, visiting all pages on the same domain and printing each URL visited along with the links found on that page.
+
+## Requirements
+
+Java 21 (Gradle wrapper is bundled — no need to install Gradle separately).
+
+## Run
+
 ```bash
-chmod +x gradlew
+./gradlew run --args="https://example.com"
 ```
 
-Then build and run:
+Or build a standalone CLI and run it directly:
+
 ```bash
-./gradlew build
-./gradlew run
+./gradlew installDist
+./build/install/WebCrawler/bin/WebCrawler https://example.com
 ```
 
-## Running locally
-```
-./gradlew build
-```
+## Test
 
-```
-./gradlew run
-```
-
-```
+```bash
 ./gradlew test
-```
-
-```
-./gradlew clean
-```
-
-## Package
-```
-./gradlew distZip
 ```
