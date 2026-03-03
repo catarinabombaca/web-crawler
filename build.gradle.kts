@@ -41,6 +41,10 @@ tasks {
 
     withType<Test> {
         useJUnitPlatform()
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
+        outputs.upToDateWhen { false }
     }
 
     java {
