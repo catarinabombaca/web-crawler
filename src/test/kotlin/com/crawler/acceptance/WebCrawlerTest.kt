@@ -5,8 +5,6 @@ import com.crawler.adapters.http.CrawlRoute
 import com.crawler.adapters.http.app
 import org.http4k.core.Method
 import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status
 import org.http4k.core.with
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -16,34 +14,42 @@ import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 
 class WebCrawlerTest {
+    private val outputStream = ByteArrayOutputStream()
+    private val originalOut = System.out
+
+    @BeforeEach
+    fun setUp() {
+        System.setOut(PrintStream(outputStream))
+    }
+
+    @AfterEach
+    fun tearDown() {
+        System.setOut(originalOut)
+        outputStream.reset()
+    }
+
     @Test
     fun `Given a seed URL, the crawler should visit each URL it finds on the same domain`() {
-        val seedUrl = "https://crawlme.monzo.com"
-        val numberOfExpectedVisitedUrls = 12
-
+        val seedUrl = "https://example.com/"
+        val numberOfExpectedVisitedUrls = 3
         val requestBody = CrawlRequestDTO(url = seedUrl)
+
         app(
             Request(Method.POST, "/crawl")
                 .with(CrawlRoute.crawlRequestDTOLens of requestBody)
         )
-        val printedUrls = "outputStream.toString().trim().lines().filter { it.isNotBlank() }"
+
+        val printedUrls = outputStream.toString().trim().lines().size
         assertEquals(numberOfExpectedVisitedUrls, printedUrls)
     }
 
     @Test
     fun `Given a seed URL, the crawler should print each URL visited, and a list of links found on that page`() {
-        val seedUrl = "https://crawlme.monzo.com"
+        val seedUrl = "https://example.com/"
         val expectedOutput = """
-            Visited: https://crawlme.monzo.com/ -> Found links: https://crawlme.monzo.com/about, https://crawlme.monzo.com/contact, https://crawlme.monzo.com/products
-            Visited: https://crawlme.monzo.com/about -> Found links: https://crawlme.monzo.com/team, https://crawlme.monzo.com/careers
-            Visited: https://crawlme.monzo.com/contact -> Found links: https://crawlme.monzo.com/support, https://crawlme.monzo.com/feedback
-            Visited: https://crawlme.monzo.com/products -> Found links: https://crawlme.monzo.com/products/monzo-card, https://crawlme.monzo.com/products/monzo-app
-            Visited: https://crawlme.monzo.com/team -> Found links: N/A
-            Visited: https://crawlme.monzo.com/careers -> Found links: N/A
-            Visited: https://crawlme.monzo.com/support -> Found links: N/A
-            Visited: https://crawlme.monzo.com/feedback -> Found links: N/A
-            Visited: https://crawlme.monzo.com/products/monzo-card -> Found links: N/A
-            Visited: https://crawlme.monzo.com/products/monzo-app -> Found links: N/A
+            Visited: https://example.com/ -> Found links: https://example.com/about, https://example.com/contact, https://potato.com/
+            Visited: https://example.com/about -> Found links: N/A
+            Visited: https://example.com/contact -> Found links: N/A
         """.trimIndent()
 
         val requestBody = CrawlRequestDTO(url = seedUrl)
@@ -51,7 +57,8 @@ class WebCrawlerTest {
             Request(Method.POST, "/crawl")
                 .with(CrawlRoute.crawlRequestDTOLens of requestBody)
         )
-        val printedUrls = "outputStream.toString().trim()"
-        assertEquals(expectedOutput, printedUrls)
+
+        val printedOutput = outputStream.toString().trim()
+        assertEquals(expectedOutput, printedOutput)
     }
 }

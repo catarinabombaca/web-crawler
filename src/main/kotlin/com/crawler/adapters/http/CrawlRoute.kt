@@ -1,18 +1,18 @@
 package com.crawler.adapters.http
 
 import com.crawler.domain.ports.Crawler
+import dev.forkhandles.result4k.map
+import dev.forkhandles.result4k.recover
 import org.http4k.contract.ContractRoute
 import org.http4k.contract.bindContract
-import org.http4k.contract.div
 import org.http4k.contract.meta
 import org.http4k.contract.openapi.OpenAPIJackson.auto
 import org.http4k.core.Body
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
-import org.http4k.core.Response.Companion.invoke
+import org.http4k.core.Status.Companion.INTERNAL_SERVER_ERROR
 import org.http4k.core.Status.Companion.OK
-import org.http4k.format.ConfigurableJackson
 
 class CrawlRoute(val crawler: Crawler) {
     private val spec = "/crawl" meta {
@@ -25,11 +25,11 @@ class CrawlRoute(val crawler: Crawler) {
     fun contractRoutes(): List<ContractRoute> =
         listOf(spec bindContract POST to ::crawlHandler)
 
-    private fun crawlHandler(request: Request): Response {
+    fun crawlHandler(request: Request): Response {
         val crawlRequestDTO = crawlRequestDTOLens(request)
-        crawler.crawl(crawlRequestDTO.url)
-
-        return Response(OK)
+        return crawler.crawl(crawlRequestDTO.url)
+            .map { Response(OK) }
+            .recover { Response(INTERNAL_SERVER_ERROR) }
     }
 
     companion object {
