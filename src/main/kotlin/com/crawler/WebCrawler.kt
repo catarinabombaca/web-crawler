@@ -7,7 +7,7 @@ import org.http4k.client.OkHttp
 
 fun main(args: Array<String>) {
     if (args.isEmpty()) {
-        println("Usage: web-crawler <url>")
+        println("You must provide a seed URL as an argument.")
         return
     }
 
