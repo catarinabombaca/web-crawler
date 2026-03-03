@@ -64,6 +64,32 @@ class CrawlerServiceTest {
     }
 
     @Test
+    fun `should visit each page only once when pages link back to each other like a nav bar`() {
+        val htmlFetcher = mockk<HtmlFetcher>()
+        val printer = mockk<OutputPrinter>()
+
+        val navHtml = """
+            <html><body>
+                <a href="/home">Home</a>
+                <a href="/about">About</a>
+                <a href="/contact">Contact</a>
+            </body></html>
+        """.trimIndent()
+
+        every { htmlFetcher.fetch("https://example.com/home") } returns Success(navHtml)
+        every { htmlFetcher.fetch("https://example.com/about") } returns Success(navHtml)
+        every { htmlFetcher.fetch("https://example.com/contact") } returns Success(navHtml)
+        every { printer.print(any(), any()) } returns Unit
+
+        CrawlerService(htmlFetcher, printer).crawl("https://example.com/home")
+
+        verify(exactly = 1) { htmlFetcher.fetch("https://example.com/home") }
+        verify(exactly = 1) { htmlFetcher.fetch("https://example.com/about") }
+        verify(exactly = 1) { htmlFetcher.fetch("https://example.com/contact") }
+        verify(exactly = 3) { printer.print(any(), any()) }
+    }
+
+    @Test
     fun `should skip a url that fails to fetch and continue crawling`() {
         val seedUrl = "https://example.com/"
         val htmlFetcher = mockk<HtmlFetcher>()
