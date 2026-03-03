@@ -1,5 +1,6 @@
 package com.crawler.adapters.http
 
+import com.crawler.adapters.htmlFetcher.ApiHtmlFetcher
 import com.crawler.adapters.printer.TerminalPrinter
 import com.crawler.domain.services.CrawlerService
 import org.http4k.client.OkHttp

@@ -1,19 +1,16 @@
-package com.crawler.adapters.http
+package com.crawler.adapters.htmlFetcher
 
 import com.crawler.domain.ports.CrawlerFailure
 import com.crawler.domain.ports.HtmlFetcher
-import dev.forkhandles.result4k.Failure
 import dev.forkhandles.result4k.Result
-import dev.forkhandles.result4k.Success
+import dev.forkhandles.result4k.mapFailure
+import dev.forkhandles.result4k.resultFrom
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 
 class ApiHtmlFetcher(val client: HttpHandler) : HtmlFetcher {
     override fun fetch(url: String): Result<String, CrawlerFailure> =
-        try {
-            Success(client(Request(Method.GET, url)).bodyString())
-        } catch (e: Exception) {
-            Failure(CrawlerFailure(e.message ?: "Unknown error"))
-        }
+        resultFrom { client(Request(Method.GET, url)).bodyString() }
+            .mapFailure { CrawlerFailure( "Failed to fetch HTML: ${it.message}") }
 }
