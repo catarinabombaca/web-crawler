@@ -3,7 +3,6 @@ package com.crawler
 import com.crawler.adapters.htmlFetcher.ApiHtmlFetcher
 import com.crawler.adapters.printer.TerminalPrinter
 import com.crawler.domain.services.CrawlerService
-import dev.forkhandles.result4k.onFailure
 import org.http4k.client.OkHttp
 
 fun main(args: Array<String>) {
@@ -15,8 +14,9 @@ fun main(args: Array<String>) {
     val seedUrl = args[0]
     val crawler = CrawlerService(ApiHtmlFetcher(OkHttp()), TerminalPrinter())
 
-    crawler.crawl(seedUrl).onFailure {
-        System.err.println("Error: ${it.reason.error}")
-        return
+    try {
+        crawler.crawl(seedUrl)
+    } catch (e: Exception) {
+        System.err.println("Error: ${e.message}")
     }
 }

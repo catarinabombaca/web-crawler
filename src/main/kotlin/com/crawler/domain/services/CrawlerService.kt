@@ -1,19 +1,15 @@
 package com.crawler.domain.services
 
 import com.crawler.domain.ports.Crawler
-import com.crawler.domain.ports.CrawlerFailure
 import com.crawler.domain.ports.HtmlFetcher
 import com.crawler.domain.ports.OutputPrinter
-import dev.forkhandles.result4k.Result
-import dev.forkhandles.result4k.Success
-import dev.forkhandles.result4k.onFailure
 import org.jsoup.Jsoup
 
 class CrawlerService(
     private val htmlFetcher: HtmlFetcher,
     private val outputPrinter: OutputPrinter
 ) : Crawler {
-    override fun crawl(seedUrl: String): Result<List<String>, CrawlerFailure> {
+    override fun crawl(seedUrl: String): List<String> {
         val visited = mutableSetOf<String>()
         val queue = ArrayDeque<String>()
 
@@ -23,7 +19,7 @@ class CrawlerService(
             val url = queue.removeFirst()
             if (url in visited) continue
 
-            val html = htmlFetcher.fetch(url).onFailure { return it }
+            val html = htmlFetcher.fetch(url)
             val urlsFound = extractUrls(html, url)
 
             visited.add(url)
@@ -36,12 +32,11 @@ class CrawlerService(
                 .forEach { queue.add(it) }
         }
 
-        return Success(visited.toList())
+        return visited.toList()
     }
 
-    private fun getDomain(seedUrl: String) : String {
-        return "https://${seedUrl.split("/")[2]}"
-    }
+    private fun getDomain(seedUrl: String): String =
+        "https://${seedUrl.split("/")[2]}"
 
     private fun extractUrls(html: String, url: String): List<String> {
         val doc = Jsoup.parse(html, url)

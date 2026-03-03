@@ -55,7 +55,6 @@ dependencies {
     implementation("org.http4k:http4k-client-okhttp")
     implementation("org.http4k:http4k-core")
     implementation("org.jsoup:jsoup:1.17.2")
-    implementation("dev.forkhandles:result4k:2.24.0.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.2")
     testImplementation("org.junit.platform:junit-platform-launcher:1.10.2")
