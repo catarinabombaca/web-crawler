@@ -26,18 +26,19 @@ class CrawlerService(
 
         coroutineScope {
             fun launchCrawl(url: String) {
-                if (!visited.add(url)) return
+                val normalisedUrl = normaliseUrl(url)
+                if (!visited.add(normalisedUrl)) return
 
                 launch {
                     semaphore.withPermit {
-                        val html = withContext(Dispatchers.IO) { htmlFetcher.fetch(url) }
+                        val html = withContext(Dispatchers.IO) { htmlFetcher.fetch(normalisedUrl) }
                             .onFailure {
-                                System.err.println("Failed to crawl $url: ${it.reason.message}")
+                                System.err.println("Failed to crawl $normalisedUrl: ${it.reason.message}")
                                 return@withPermit
                             }
 
-                        val urlsFound = extractUrls(html, url)
-                        outputPrinter.print(url, urlsFound)
+                        val urlsFound = extractUrls(html, normalisedUrl)
+                        outputPrinter.print(normalisedUrl, urlsFound)
                         urlsFound
                             .filter { isSameDomain(it, seedUrl) }
                             .forEach { launchCrawl(it) }
@@ -48,6 +49,11 @@ class CrawlerService(
             launchCrawl(seedUrl)
         }
     }
+
+    private fun normaliseUrl(url: String): String =
+        url.trimEnd('/').let { trimmed ->
+            if ('/' in trimmed.substringAfter("://")) trimmed else url
+        }
 
     private fun isSameDomain(url: String, seedUrl: String): Boolean =
         url.substringAfter("://").substringBefore("/") ==

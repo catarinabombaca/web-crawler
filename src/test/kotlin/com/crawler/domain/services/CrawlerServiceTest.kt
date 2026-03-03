@@ -39,6 +39,31 @@ class CrawlerServiceTest {
     }
 
     @Test
+    fun `should only visit a url once regardless of trailing slash`() {
+        val seedUrl = "https://example.com/"
+        val htmlFetcher = mockk<HtmlFetcher>()
+        val printer = mockk<OutputPrinter>()
+
+        val seedHtml = """
+            <html><body>
+                <a href="/about">About</a>
+                <a href="/about/">About with trailing slash</a>
+            </body></html>
+        """.trimIndent()
+
+        every { htmlFetcher.fetch(seedUrl) } returns Success(seedHtml)
+        every { htmlFetcher.fetch("https://example.com/about") } returns Success("dummy html")
+        every { htmlFetcher.fetch("https://example.com/about/") } returns Success("dummy html")
+        every { printer.print(any(), any()) } returns Unit
+
+        CrawlerService(htmlFetcher, printer).crawl(seedUrl)
+
+        verify(exactly = 1) { htmlFetcher.fetch(seedUrl) }
+        verify(exactly = 1) { htmlFetcher.fetch("https://example.com/about") }
+        verify(exactly = 0) { htmlFetcher.fetch("https://example.com/about/") }
+    }
+
+    @Test
     fun `should skip a url that fails to fetch and continue crawling`() {
         val seedUrl = "https://example.com/"
         val htmlFetcher = mockk<HtmlFetcher>()
