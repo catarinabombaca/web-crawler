@@ -1,5 +1,6 @@
 package com.crawler.adapters.http
 
+import com.crawler.adapters.printer.TerminalPrinter
 import com.crawler.domain.services.CrawlerService
 import org.http4k.client.OkHttp
 import org.http4k.contract.contract
@@ -22,7 +23,8 @@ val app: HttpHandler = ServerFilters.CatchLensFailure()
     .then(catchAllFilter)
     .then(routes(
         contract {
-            val htmlFetcher = apiHtmlFetcher(OkHttp())
-            routes += CrawlRoute(CrawlerService(htmlFetcher)).contractRoutes()
+            val htmlFetcher = ApiHtmlFetcher(OkHttp())
+            val terminalPrinter = TerminalPrinter()
+            routes += CrawlRoute(CrawlerService(htmlFetcher, terminalPrinter)).contractRoutes()
         }
     ))

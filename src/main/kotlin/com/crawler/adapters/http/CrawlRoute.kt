@@ -34,7 +34,7 @@ class CrawlRoute(val crawler: Crawler) {
 
     companion object {
         val crawlRequestDTOLens = Body.auto<CrawlRequestDTO>().toLens()
-        val crawlRequestDTOExample = CrawlRequestDTO(url = "https://crawlme.monzo.com")
+        val crawlRequestDTOExample = CrawlRequestDTO(url = "https://example.com")
     }
 }
 
