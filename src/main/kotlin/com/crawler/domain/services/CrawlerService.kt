@@ -10,8 +10,10 @@ class CrawlerService(
     private val client: HttpHandler,
 ) : Crawler {
     override fun crawl(seedUrl: String): List<String> {
+        val domain = "https://${seedUrl.split("/")[2]}"
         val visited = mutableSetOf<String>()
         val queue = ArrayDeque<String>()
+
         queue.add(seedUrl)
 
         while (queue.isNotEmpty()) {
@@ -23,18 +25,21 @@ class CrawlerService(
 
             visited.add(url)
 
+            val linksOutput = if (urlsFound.isEmpty()) "N/A" else urlsFound.joinToString(", ")
+            println("Visited: $url -> Found links: $linksOutput")
+
             urlsFound
                 .filter { it !in visited }
+                .filter { it.startsWith(domain) }
                 .forEach { queue.add(it) }
         }
 
         return visited.toList()
     }
 
-    private fun extractUrls(html: String, seedUrl: String): List<String> {
-        val doc = Jsoup.parse(html, seedUrl)
+    private fun extractUrls(html: String, url: String): List<String> {
+        val doc = Jsoup.parse(html, url)
         return doc.select("a[href]")
             .map { it.absUrl("href") }
-            .filter { it.startsWith("http://") || it.startsWith("https://") }
     }
 }

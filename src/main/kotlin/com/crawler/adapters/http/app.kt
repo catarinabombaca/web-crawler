@@ -10,8 +10,6 @@ import org.http4k.routing.routes
 
 
 val app: HttpHandler = routes(
-    "/ping" bind GET to ::healthHandler,
-    "/formats/json/jackson" bind GET to ::formatHandler,
     contract {
         routes += CrawlRoute(CrawlerService(OkHttp())).contractRoutes()
     }
