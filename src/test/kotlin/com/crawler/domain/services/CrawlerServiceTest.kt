@@ -8,15 +8,13 @@ import dev.forkhandles.result4k.Success
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class CrawlerServiceTest {
 
     @Test
-    fun `should visit each url it finds on the same domain and return a list of all urls visited`() {
+    fun `should visit each url it finds on the same domain and print the links found`() {
         val seedUrl = "https://example.com/"
-        val expectedUrls = setOf("https://example.com/", "https://example.com/about", "https://example.com/contact")
         val htmlFetcher = mockk<HtmlFetcher>()
         val printer = mockk<OutputPrinter>()
 
@@ -33,10 +31,10 @@ class CrawlerServiceTest {
         every { htmlFetcher.fetch("https://example.com/contact") } returns Success("dummy html")
         every { printer.print(any(), any()) } returns Unit
 
-        val actual = CrawlerService(htmlFetcher, printer).crawl(seedUrl)
+        CrawlerService(htmlFetcher, printer).crawl(seedUrl)
 
-        assertEquals(expectedUrls, actual.toSet())
         verify(exactly = 3) { htmlFetcher.fetch(any()) }
+        verify(exactly = 0) { htmlFetcher.fetch("https://potato.com/") }
         verify(exactly = 3) { printer.print(any(), any()) }
     }
 
@@ -54,13 +52,13 @@ class CrawlerServiceTest {
         """.trimIndent()
 
         every { htmlFetcher.fetch(seedUrl) } returns Success(seedHtml)
-        every { htmlFetcher.fetch("https://example.com/about") } returns Failure(CrawlerFailure("HTTP 404"))
+        every { htmlFetcher.fetch("https://example.com/about") } returns Failure(CrawlerFailure("Server error: HTTP 404"))
         every { htmlFetcher.fetch("https://example.com/contact") } returns Success("dummy html")
         every { printer.print(any(), any()) } returns Unit
 
-        val actual = CrawlerService(htmlFetcher, printer).crawl(seedUrl)
+        CrawlerService(htmlFetcher, printer).crawl(seedUrl)
 
-        assertEquals(setOf(seedUrl, "https://example.com/about", "https://example.com/contact"), actual.toSet())
+        verify(exactly = 3) { htmlFetcher.fetch(any()) }
         verify(exactly = 2) { printer.print(any(), any()) }
     }
 }

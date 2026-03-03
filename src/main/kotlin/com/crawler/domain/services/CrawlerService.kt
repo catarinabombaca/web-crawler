@@ -22,7 +22,7 @@ class CrawlerService(
     private val concurrency: Int = 64
 ) : Crawler {
 
-    override fun crawl(seedUrl: String): List<String> = runBlocking {
+    override fun crawl(seedUrl: String) = runBlocking {
         val visited = ConcurrentHashMap.newKeySet<String>()
         val semaphore = Semaphore(concurrency)
 
@@ -48,8 +48,6 @@ class CrawlerService(
 
             launchCrawl(seedUrl)
         }
-
-        visited.toList()
     }
 
     private fun isSameDomain(url: String, seedUrl: String): Boolean =
