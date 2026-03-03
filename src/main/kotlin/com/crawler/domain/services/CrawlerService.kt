@@ -4,6 +4,7 @@ import com.crawler.domain.ports.Crawler
 import com.crawler.domain.ports.HtmlFetcher
 import com.crawler.domain.ports.OutputPrinter
 import org.jsoup.Jsoup
+import java.net.URI
 
 class CrawlerService(
     private val htmlFetcher: HtmlFetcher,
@@ -28,15 +29,15 @@ class CrawlerService(
 
             urlsFound
                 .filter { it !in visited }
-                .filter { it.startsWith(getDomain(seedUrl)) }
+                .filter { isSameDomain(it, seedUrl) }
                 .forEach { queue.add(it) }
         }
 
         return visited.toList()
     }
 
-    private fun getDomain(seedUrl: String): String =
-        "https://${seedUrl.split("/")[2]}"
+    private fun isSameDomain(url: String, seedUrl: String): Boolean =
+        try { URI(url).host == URI(seedUrl).host } catch (e: Exception) { false }
 
     private fun extractUrls(html: String, url: String): List<String> {
         val doc = Jsoup.parse(html, url)

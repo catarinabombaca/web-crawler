@@ -2,7 +2,6 @@ package com.crawler.domain.services
 
 import com.crawler.domain.ports.HtmlFetcher
 import com.crawler.domain.ports.OutputPrinter
-import com.crawler.fakes.exampleHtml
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -18,7 +17,15 @@ class CrawlerServiceTest {
         val htmlFetcher = mockk<HtmlFetcher>()
         val printer = mockk<OutputPrinter>()
 
-        every { htmlFetcher.fetch(seedUrl) } returns exampleHtml
+        val seedHtml = """
+            <html><body>
+                <a href="/about">About</a>
+                <a href="/contact">Contact</a>
+                <a href="https://potato.com/">Potato</a>
+            </body></html>
+        """.trimIndent()
+
+        every { htmlFetcher.fetch(seedUrl) } returns seedHtml
         every { htmlFetcher.fetch("https://example.com/about") } returns "dummy html"
         every { htmlFetcher.fetch("https://example.com/contact") } returns "dummy html"
         every { printer.print(any(), any()) } returns Unit
