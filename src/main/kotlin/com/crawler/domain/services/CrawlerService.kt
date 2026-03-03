@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap
 class CrawlerService(
     private val htmlFetcher: HtmlFetcher,
     private val outputPrinter: OutputPrinter,
-    private val parallelFetches: Int = 64
+    private val parallelFetches: Int = 60
 ) : Crawler {
 
     override fun crawl(seedUrl: String) = runBlocking {

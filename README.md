@@ -9,6 +9,7 @@ with the links found on that page. The output of successful visits are printed t
 
 - Java 21 (Gradle wrapper is bundled — no need to install Gradle separately).
 - After unzipping, make the Gradle wrapper executable: `chmod +x gradlew`
+- If you still have permissions issues, try: `xattr -d com.apple.quarantine ./gradlew`
 
 ### Run
 
